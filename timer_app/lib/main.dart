@@ -1,31 +1,7 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'src/ui/my_screen.dart';
-// import 'src/bloc/timer_bloc.dart';
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Timer App',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: BlocProvider(
-//         create: (context) => TimerBloc(),
-//         child: MyScreen(),
-//       ),
-//     );
-//   }
-// }
-
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'src/ui/my_screen.dart';
+import 'src/bloc/timer_bloc.dart';
 
 void main() {
   runApp(MyApp());
@@ -47,290 +23,312 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyScreen extends StatelessWidget {
-  final TextEditingController _minuteController = TextEditingController();
-  final TextEditingController _secondController = TextEditingController();
+// import 'dart:async';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Timer List"),
-      ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Container(
-              color: Colors.yellow,
-              height: MediaQuery.of(context).size.height * 0.2,
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _minuteController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: "Minutes"),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _secondController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: "Seconds"),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      int minutes = int.tryParse(_minuteController.text) ?? 0;
-                      int seconds = int.tryParse(_secondController.text) ?? 0;
+// void main() {
+//   runApp(MyApp());
+// }
 
-                      if (minutes > 59) {
-                        minutes = 59;
-                      }
-                      if (seconds > 59) {
-                        seconds = 59;
-                      }
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Timer App',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       home: BlocProvider(
+//         create: (context) => TimerBloc(),
+//         child: MyScreen(),
+//       ),
+//     );
+//   }
+// }
 
-                      if (minutes > 0 || seconds > 0) {
-                        final TimerItem timerItem = TimerItem(
-                            minutes: minutes,
-                            seconds: seconds,
-                            context: context);
-                        BlocProvider.of<TimerBloc>(context)
-                            .add(AddTimer(timerItem));
-                      }
+// class MyScreen extends StatelessWidget {
+//   final TextEditingController _minuteController = TextEditingController();
+//   final TextEditingController _secondController = TextEditingController();
 
-                      _minuteController.clear();
-                      _secondController.clear();
-                    },
-                    child: const Text("Add"),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          BlocBuilder<TimerBloc, TimerState>(
-            builder: (context, state) {
-              if (state is TimerLoadedState) {
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final TimerItem timerItem = state.timerItems[index];
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Timer List"),
+//       ),
+//       body: CustomScrollView(
+//         slivers: [
+//           SliverToBoxAdapter(
+//             child: Container(
+//               color: Colors.yellow,
+//               height: MediaQuery.of(context).size.height * 0.2,
+//               padding: const EdgeInsets.all(16.0),
+//               child: Row(
+//                 children: [
+//                   Expanded(
+//                     child: TextField(
+//                       controller: _minuteController,
+//                       keyboardType: TextInputType.number,
+//                       decoration: const InputDecoration(labelText: "Minutes"),
+//                     ),
+//                   ),
+//                   const SizedBox(width: 10),
+//                   Expanded(
+//                     child: TextField(
+//                       controller: _secondController,
+//                       keyboardType: TextInputType.number,
+//                       decoration: const InputDecoration(labelText: "Seconds"),
+//                     ),
+//                   ),
+//                   const SizedBox(width: 10),
+//                   ElevatedButton(
+//                     onPressed: () {
+//                       int minutes = int.tryParse(_minuteController.text) ?? 0;
+//                       int seconds = int.tryParse(_secondController.text) ?? 0;
 
-                      return Card(
-                        color: timerItem.timerColor, // Use the timer color here
-                        child: ListTile(
-                          title: CountdownTimer(
-                            timerItem: timerItem,
-                            index: index,
-                          ),
-                          trailing: IconButton(
-                            icon: Icon(
-                              timerItem.isRunning
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                            ),
-                            onPressed: () {
-                              context.read<TimerBloc>().add(ToggleTimer(index));
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: state.timerItems.length,
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: Text("Please Add Data"),
-                );
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
+//                       if (minutes > 59) {
+//                         minutes = 59;
+//                       }
+//                       if (seconds > 59) {
+//                         seconds = 59;
+//                       }
 
-class TimerEvent {}
+//                       if (minutes > 0 || seconds > 0) {
+//                         final TimerItem timerItem = TimerItem(
+//                             minutes: minutes,
+//                             seconds: seconds,
+//                             context: context);
+//                         BlocProvider.of<TimerBloc>(context)
+//                             .add(AddTimer(timerItem));
+//                       }
 
-class AddTimer extends TimerEvent {
-  final TimerItem timerItem;
+//                       _minuteController.clear();
+//                       _secondController.clear();
+//                     },
+//                     child: const Text("Add"),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//           BlocBuilder<TimerBloc, TimerState>(
+//             builder: (context, state) {
+//               if (state is TimerLoadedState) {
+//                 return SliverList(
+//                   delegate: SliverChildBuilderDelegate(
+//                     (context, index) {
+//                       final TimerItem timerItem = state.timerItems[index];
 
-  AddTimer(this.timerItem);
-}
+//                       return Card(
+//                         color: timerItem.timerColor,
+//                         child: ListTile(
+//                           title: CountdownTimer(
+//                             timerItem: timerItem,
+//                             index: index,
+//                           ),
+//                           trailing: IconButton(
+//                             icon: Icon(
+//                               timerItem.isRunning
+//                                   ? Icons.pause
+//                                   : Icons.play_arrow,
+//                             ),
+//                             onPressed: () {
+//                               context.read<TimerBloc>().add(ToggleTimer(index));
+//                             },
+//                           ),
+//                         ),
+//                       );
+//                     },
+//                     childCount: state.timerItems.length,
+//                   ),
+//                 );
+//               } else {
+//                 return const Center(
+//                   child: Text("Please Add Data"),
+//                 );
+//               }
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
-class ToggleTimer extends TimerEvent {
-  final int index;
+// class TimerEvent {}
 
-  ToggleTimer(this.index);
-}
+// class AddTimer extends TimerEvent {
+//   final TimerItem timerItem;
 
-class StartPausedTimer extends TimerEvent {
-  final int index;
+//   AddTimer(this.timerItem);
+// }
 
-  StartPausedTimer(this.index);
-}
+// class ToggleTimer extends TimerEvent {
+//   final int index;
 
-class RemoveTimerItem extends TimerEvent {
-  final TimerItem timerItem;
+//   ToggleTimer(this.index);
+// }
 
-  RemoveTimerItem(this.timerItem);
-}
+// class StartPausedTimer extends TimerEvent {
+//   final int index;
 
-class TimerState {}
+//   StartPausedTimer(this.index);
+// }
 
-class TimerLoadedState extends TimerState {
-  final List<TimerItem> timerItems;
+// class RemoveTimerItem extends TimerEvent {
+//   final TimerItem timerItem;
 
-  TimerLoadedState(this.timerItems);
-}
+//   RemoveTimerItem(this.timerItem);
+// }
 
-class TimerBloc extends Bloc<TimerEvent, TimerState> {
-  // ignore: prefer_final_fields
-  List<TimerItem> _timerItems = [];
+// class TimerState {}
 
-  TimerBloc() : super(TimerLoadedState([])) {
-    on<AddTimer>((event, emit) {
-      if (_timerItems.length < 10) {
-        _timerItems.add(event.timerItem);
-        emit(TimerLoadedState(List.from(_timerItems)));
-      }
-    });
+// class TimerLoadedState extends TimerState {
+//   final List<TimerItem> timerItems;
 
-    on<ToggleTimer>((event, emit) {
-      _timerItems[event.index].toggleTimer();
-      _timerItems[event.index].updateColor();
+//   TimerLoadedState(this.timerItems);
+// }
 
-      if (!_timerItems[event.index].isRunning) {
-        _timerItems[event.index].pauseTimer();
-      }
+// class TimerBloc extends Bloc<TimerEvent, TimerState> {
+//   List<TimerItem> _timerItems = [];
 
-      emit(TimerLoadedState(List.from(_timerItems)));
-    });
+//   TimerBloc() : super(TimerLoadedState([])) {
+//     on<AddTimer>((event, emit) {
+//       if (_timerItems.length < 10) {
+//         _timerItems.add(event.timerItem);
+//         emit(TimerLoadedState(List.from(_timerItems)));
+//       }
+//     });
 
-    on<StartPausedTimer>((event, emit) {
-      _timerItems[event.index].resumeTimer();
+//     on<ToggleTimer>((event, emit) {
+//       _timerItems[event.index].toggleTimer();
+//       _timerItems[event.index].updateColor();
 
-      emit(TimerLoadedState(List.from(_timerItems)));
-    });
+//       if (!_timerItems[event.index].isRunning) {
+//         _timerItems[event.index].pauseTimer();
+//         _timerItems[event.index].updateColor();
+//       }
 
-    on<RemoveTimerItem>((event, emit) {
-      event.timerItem.dispose();
-      _timerItems.remove(event.timerItem);
-      emit(TimerLoadedState(List.from(_timerItems)));
-    });
-  }
-}
+//       emit(TimerLoadedState(List.from(_timerItems)));
+//     });
 
-class TimerItem {
-  int minutes;
-  int seconds;
-  bool isRunning;
-  final BuildContext context;
-  late StreamController<String> streamController;
-  late Stream<String> timerStream;
-  Timer? timer;
+//     on<StartPausedTimer>((event, emit) {
+//       _timerItems[event.index].resumeTimer();
 
-  TimerItem({
-    required this.minutes,
-    required this.seconds,
-    this.isRunning = true,
-    required this.context,
-  }) : streamController = StreamController<String>.broadcast() {
-    timerStream = streamController.stream;
+//       emit(TimerLoadedState(List.from(_timerItems)));
+//     });
 
-    if (isRunning) {
-      startTimer();
-    }
-  }
+//     on<RemoveTimerItem>((event, emit) {
+//       event.timerItem.dispose();
+//       _timerItems.remove(event.timerItem);
+//       emit(TimerLoadedState(List.from(_timerItems)));
+//     });
+//   }
+// }
 
-  Color get timerColor {
-    if (isRunning) {
-      if (minutes > 0 || seconds > 30) {
-        return Colors.green;
-      } else {
-        return Colors.red;
-      }
-    } else {
-      return Colors.yellow;
-    }
-  }
+// class TimerItem {
+//   int minutes;
+//   int seconds;
+//   bool isRunning;
+//   final BuildContext context;
+//   late StreamController<String> streamController;
+//   late Stream<String> timerStream;
+//   Timer? timer;
+//   ValueNotifier<Color> timerColorNotifier; // Added ValueNotifier for color
 
-  void startTimer() {
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      Duration duration = Duration(minutes: minutes, seconds: seconds);
-      duration -= const Duration(seconds: 1);
+//   TimerItem({
+//     required this.minutes,
+//     required this.seconds,
+//     this.isRunning = true,
+//     required this.context,
+//     Color initialColor = Colors.green,
+//   })  : streamController = StreamController<String>.broadcast(),
+//         timerColorNotifier = ValueNotifier<Color>(initialColor) {
+//     timerStream = streamController.stream;
 
-      if (duration.inSeconds <= 0) {
-        timer.cancel();
-        streamController.add("00:00");
-        streamController.close();
-        context.read<TimerBloc>().add(RemoveTimerItem(this));
-      } else {
-        minutes = duration.inMinutes;
-        seconds = duration.inSeconds % 60;
-        String timeString =
-            "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
-        streamController.add(timeString);
-        updateColor();
-      }
-    });
-  }
+//     if (isRunning) {
+//       startTimer();
+//     }
+//   }
 
-  void updateColor() {
-    // No need to update color logic here
-  }
+//   Color get timerColor => timerColorNotifier.value;
 
-  void toggleTimer() {
-    if (isRunning) {
-      pauseTimer();
-    } else {
-      resumeTimer();
-    }
-  }
+//   void startTimer() {
+//     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+//       Duration duration = Duration(minutes: minutes, seconds: seconds);
+//       duration -= const Duration(seconds: 1);
 
-  void pauseTimer() {
-    timer?.cancel();
-    isRunning = false;
-  }
+//       if (duration.inSeconds <= 0) {
+//         timer.cancel();
+//         streamController.add("00:00");
+//         streamController.close();
+//         context.read<TimerBloc>().add(RemoveTimerItem(this));
+//       } else {
+//         minutes = duration.inMinutes;
+//         seconds = duration.inSeconds % 60;
+//         String timeString =
+//             "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
+//         streamController.add(timeString);
+//         updateColor();
+//       }
+//     });
+//   }
 
-  void resumeTimer() {
-    if (!isRunning) {
-      isRunning = true;
-      startTimer();
-    }
-  }
+//   void updateColor() {
+//     if (minutes > 0 || seconds > 30) {
+//       timerColorNotifier.value = Colors.green;
+//     } else {
+//       timerColorNotifier.value = Colors.red;
+//     }
+//   }
 
-  void dispose() {
-    timer?.cancel();
-    streamController.close();
-  }
-}
+//   void toggleTimer() {
+//     if (isRunning) {
+//       pauseTimer();
+//     } else {
+//       resumeTimer();
+//     }
+//   }
 
-class CountdownTimer extends StatelessWidget {
-  final TimerItem timerItem;
-  final int index;
+//   void pauseTimer() {
+//     timer?.cancel();
+//     isRunning = false;
+//   }
 
-  const CountdownTimer({Key? key, required this.timerItem, required this.index})
-      : super(key: key);
+//   void resumeTimer() {
+//     if (!isRunning) {
+//       isRunning = true;
+//       startTimer();
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<String>(
-      stream: timerItem.timerStream,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Text(snapshot.data!);
-        }
-        return Text(
-          "${timerItem.minutes.toString().padLeft(2, '0')}:${timerItem.seconds.toString().padLeft(2, '0')}",
-        );
-      },
-    );
-  }
-}
+//   void dispose() {
+//     timer?.cancel();
+//     streamController.close();
+//     timerColorNotifier.dispose();
+//   }
+// }
+
+// class CountdownTimer extends StatelessWidget {
+//   final TimerItem timerItem;
+//   final int index;
+
+//   const CountdownTimer({Key? key, required this.timerItem, required this.index})
+//       : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return StreamBuilder<String>(
+//       stream: timerItem.timerStream,
+//       builder: (context, snapshot) {
+//         if (snapshot.hasData) {
+//           return Text(snapshot.data!);
+//         }
+//         return Text(
+//           "${timerItem.minutes.toString().padLeft(2, '0')}:${timerItem.seconds.toString().padLeft(2, '0')}",
+//         );
+//       },
+//     );
+//   }
+// }

@@ -17,7 +17,7 @@ class CountdownTimer extends StatelessWidget {
           return Text(snapshot.data!);
         }
         return Text(
-          "${timerItem.minutes.toString().padLeft(2, '0')}:${timerItem.seconds.toString().padLeft(2, '0')}",
+          "${timerItem.minutes.toString().padLeft(2, '0')}:${timerItem.seconds.toString().padLeft(2, '0')}   ",
         );
       },
     );

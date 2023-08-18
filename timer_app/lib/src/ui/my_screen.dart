@@ -4,32 +4,46 @@ import 'package:timer_app/src/bloc/timer_bloc.dart';
 import 'package:timer_app/src/bloc/timer_event.dart';
 import 'package:timer_app/src/bloc/timer_state.dart';
 import 'package:timer_app/src/models/timer_item.dart';
-import 'package:timer_app/src/widgets/countdown_timer.dart';
+import 'package:timer_app/src/widgets/card_widget.dart';
 
 class MyScreen extends StatelessWidget {
   final TextEditingController _minuteController = TextEditingController();
   final TextEditingController _secondController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
+
+  MyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Timer List"),
+        title: const Text("Timer List"),
       ),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Container(
-              color: Colors.yellow,
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 34, 209, 198),
+                  border: Border.all(color: Colors.blue, width: 4)),
+              // color: Colors.grey,
               height: MediaQuery.of(context).size.height * 0.2,
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _textController,
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(labelText: "Text"),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
                       controller: _minuteController,
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(labelText: "Minutes"),
+                      decoration: const InputDecoration(labelText: "Minutes"),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -37,7 +51,7 @@ class MyScreen extends StatelessWidget {
                     child: TextField(
                       controller: _secondController,
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(labelText: "Seconds"),
+                      decoration: const InputDecoration(labelText: "Seconds"),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -57,16 +71,18 @@ class MyScreen extends StatelessWidget {
                         final TimerItem timerItem = TimerItem(
                           minutes: minutes,
                           seconds: seconds,
+                          context: context,
+                          text: _textController.text,
                         );
-                        context
-                            .read<TimerBloc>()
-                            .add(AddTimer(timerItem)); // Updated here
+                        BlocProvider.of<TimerBloc>(context)
+                            .add(AddTimer(timerItem));
                       }
 
                       _minuteController.clear();
                       _secondController.clear();
+                      _textController.clear();
                     },
-                    child: Text("Add"),
+                    child: const Text("Add"),
                   ),
                 ],
               ),
@@ -79,48 +95,15 @@ class MyScreen extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final TimerItem timerItem = state.timerItems[index];
-                      if (timerItem.seconds == 0) {
-                        context
-                            .read<TimerBloc>()
-                            .add(RemoveTimer(index)); // Updated here
-                      }
-                      Color timerColor = timerItem.isRunning
-                          ? (timerItem.seconds < 30 ? Colors.red : Colors.green)
-                          : Colors.yellow;
 
-                      return Card(
-                        color: timerColor,
-                        child: ListTile(
-                          title: CountdownTimer(
-                            timerItem: timerItem,
-                            index: index,
-                          ),
-                          trailing: IconButton(
-                            icon: Icon(
-                              timerItem.isRunning
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                            ),
-                            onPressed: () {
-                              context
-                                  .read<TimerBloc>()
-                                  .add(ToggleTimer(index)); // Updated here
-                            },
-                          ),
-                          onTap: () {
-                            // Handle tap on the timer item if needed
-                          },
-                        ),
-                      );
+                      return CardWidget(timerItem: timerItem, index: index);
                     },
                     childCount: state.timerItems.length,
                   ),
                 );
               } else {
-                return SliverFillRemaining(
-                  child: Center(
-                    child: Text("Please Add Data"),
-                  ),
+                return const Center(
+                  child: Text("Please Add Data"),
                 );
               }
             },
