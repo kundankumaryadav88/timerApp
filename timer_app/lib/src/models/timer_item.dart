@@ -1,22 +1,49 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:timer_app/src/bloc/timer_bloc.dart';
+import 'package:timer_app/src/bloc/timer_event.dart';
+
 class TimerItem {
   int minutes;
   int seconds;
   bool isRunning;
+  String text;
+  final BuildContext context;
   late StreamController<String> streamController;
   late Stream<String> timerStream;
   Timer? timer;
 
+  late ValueNotifier<Color> timerColorNotifier;
+
   TimerItem({
     required this.minutes,
+    required this.text,
     required this.seconds,
     this.isRunning = true,
-  }) : streamController = StreamController<String>() {
+    required this.context,
+  })  : streamController = StreamController<String>.broadcast(),
+        timerColorNotifier = ValueNotifier<Color>(Colors.green) {
     timerStream = streamController.stream;
+
     if (isRunning) {
       startTimer();
     }
+  }
+
+  void updateColor() {
+    if (isRunning) {
+      if (minutes > 0 || seconds > 30) {
+        timerColorNotifier.value = Colors.green;
+      } else {
+        timerColorNotifier.value = Colors.red;
+      }
+    } else {
+      timerColorNotifier.value =
+          Colors.yellow; // Set color to yellow when paused
+    }
+    context.read<TimerBloc>().add(UpdateTimerColor(this));
   }
 
   void startTimer() {
@@ -28,26 +55,36 @@ class TimerItem {
         timer.cancel();
         streamController.add("00:00");
         streamController.close();
+        context.read<TimerBloc>().add(RemoveTimerItem(this));
       } else {
         minutes = duration.inMinutes;
         seconds = duration.inSeconds % 60;
-        streamController.add(
-          "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}",
-        );
+        String timeString =
+            "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
+        streamController.add(timeString);
+        updateColor();
       }
     });
   }
 
   void toggleTimer() {
     if (isRunning) {
-      timer?.cancel();
-      streamController.close();
+      pauseTimer();
     } else {
-      if (!streamController.isClosed) {
-        startTimer();
-      }
+      resumeTimer();
     }
-    isRunning = !isRunning;
+  }
+
+  void pauseTimer() {
+    timer?.cancel();
+    isRunning = false;
+  }
+
+  void resumeTimer() {
+    if (!isRunning) {
+      isRunning = true;
+      startTimer();
+    }
   }
 
   void dispose() {

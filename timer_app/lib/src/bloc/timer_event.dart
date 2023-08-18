@@ -1,37 +1,41 @@
-import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:timer_app/src/models/timer_item.dart';
 
 // Events
-abstract class TimerEvent extends Equatable {
-  const TimerEvent();
-
-  @override
-  List<Object> get props => [];
-}
+class TimerEvent {}
 
 class AddTimer extends TimerEvent {
   final TimerItem timerItem;
 
   AddTimer(this.timerItem);
-
-  @override
-  List<Object> get props => [timerItem];
 }
 
 class ToggleTimer extends TimerEvent {
   final int index;
 
   ToggleTimer(this.index);
-
-  @override
-  List<Object> get props => [index];
 }
 
-class RemoveTimer extends TimerEvent {
+class StartPausedTimer extends TimerEvent {
   final int index;
 
-  RemoveTimer(this.index);
+  StartPausedTimer(this.index);
+}
 
-  @override
-  List<Object> get props => [index];
+class RemoveTimerItem extends TimerEvent {
+  final TimerItem timerItem;
+
+  RemoveTimerItem(this.timerItem);
+}
+
+class UpdateTimerColor extends TimerEvent {
+  final TimerItem timerItem;
+
+  UpdateTimerColor(this.timerItem);
+}
+
+class UpdatePausedColor extends TimerEvent {
+  final Color color;
+
+  UpdatePausedColor(this.color);
 }

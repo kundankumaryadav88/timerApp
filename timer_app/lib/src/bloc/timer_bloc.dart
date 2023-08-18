@@ -6,23 +6,43 @@ import 'package:timer_app/src/models/timer_item.dart';
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
   List<TimerItem> _timerItems = [];
 
-  TimerBloc() : super(TimerLoadedState([]));
-
-  Stream<TimerState> mapEventToState(
-    TimerEvent event,
-  ) async* {
-    if (event is AddTimer) {
+  TimerBloc() : super(TimerLoadedState([])) {
+    on<AddTimer>((event, emit) {
       if (_timerItems.length < 10) {
         _timerItems.add(event.timerItem);
-        yield TimerLoadedState(List.from(_timerItems));
+        emit(TimerLoadedState(List.from(_timerItems)));
       }
-    } else if (event is ToggleTimer) {
+    });
+
+    on<ToggleTimer>((event, emit) {
       _timerItems[event.index].toggleTimer();
-      yield TimerLoadedState(List.from(_timerItems));
-    } else if (event is RemoveTimer) {
-      _timerItems[event.index].dispose();
-      _timerItems.removeAt(event.index);
-      yield TimerLoadedState(List.from(_timerItems));
-    }
+
+      // Update color when paused
+      if (!_timerItems[event.index].isRunning) {
+        _timerItems[event.index].updateColor();
+      }
+
+      emit(TimerLoadedState(List.from(_timerItems)));
+    });
+
+    on<StartPausedTimer>((event, emit) {
+      _timerItems[event.index].resumeTimer();
+
+      emit(TimerLoadedState(List.from(_timerItems)));
+    });
+
+    on<RemoveTimerItem>((event, emit) {
+      event.timerItem.dispose();
+      _timerItems.remove(event.timerItem);
+      emit(TimerLoadedState(List.from(_timerItems)));
+    });
+
+    on<UpdateTimerColor>((event, emit) {
+      emit(TimerLoadedState(List.from(_timerItems)));
+    });
+
+    on<UpdatePausedColor>((event, emit) {
+      emit(TimerLoadedState(List.from(_timerItems)));
+    });
   }
 }
